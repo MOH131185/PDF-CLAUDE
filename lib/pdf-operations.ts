@@ -41,7 +41,7 @@ export async function splitPDF(file: File, pageRanges: string[]): Promise<{ name
   return results;
 }
 
-export async function compressPDF(file: File, quality: number = 0.7): Promise<Uint8Array> {
+export async function compressPDF(file: File): Promise<Uint8Array> {
   const pdfBytes = await file.arrayBuffer();
   const pdf = await PDFDocument.load(pdfBytes);
   

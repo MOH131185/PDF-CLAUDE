@@ -57,7 +57,7 @@ export default function PDFSplitter() {
         throw new Error('Failed to split PDF');
       }
 
-      const result = await response.json();
+      await response.json();
       
       // In a real implementation, you would handle multiple file downloads
       toast.success(`PDF split into ${ranges.length} files successfully!`);
@@ -138,7 +138,7 @@ export default function PDFSplitter() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Specify page ranges separated by commas (e.g., "1-5, 6-10" or "1, 3, 5-7")
+                    Specify page ranges separated by commas (e.g., &quot;1-5, 6-10&quot; or &quot;1, 3, 5-7&quot;)
                   </p>
                 </div>
               )}

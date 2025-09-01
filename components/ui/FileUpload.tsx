@@ -7,7 +7,6 @@ import { Upload, File, X } from 'lucide-react';
 interface FileUploadProps {
   files: File[];
   onFilesChange: (files: File[]) => void;
-  accept?: string;
   multiple?: boolean;
   maxFiles?: number;
   maxSize?: number;
@@ -17,7 +16,6 @@ interface FileUploadProps {
 export default function FileUpload({
   files,
   onFilesChange,
-  accept = '.pdf',
   multiple = true,
   maxFiles = 10,
   maxSize = 50 * 1024 * 1024, // 50MB

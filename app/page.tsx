@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { FileText, Merge, Split, Archive, Star, Check } from 'lucide-react';
+import { FileText, Merge, Split, Archive, Check } from 'lucide-react';
 import PricingCard from '@/components/ui/PricingCard';
 
 export default function Home() {

@@ -104,7 +104,9 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500">{operation.date}</span>
+                      <span className="text-sm text-gray-500">
+                        {new Date(operation.created_at).toLocaleDateString()}
+                      </span>
                       <button className="p-2 text-gray-400 hover:text-gray-600">
                         <Download className="w-4 h-4" />
                       </button>

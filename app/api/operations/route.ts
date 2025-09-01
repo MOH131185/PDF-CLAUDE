@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
         
         const mergedPDF = await mergePDFs(files);
         
-        return new NextResponse(mergedPDF, {
+        return new NextResponse(Buffer.from(mergedPDF), {
           headers: {
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename="merged.pdf"',
@@ -38,15 +38,14 @@ export async function POST(req: NextRequest) {
       
       case 'compress': {
         const file = formData.get('file') as File;
-        const quality = parseFloat(formData.get('quality') as string) || 0.7;
         
         if (!file) {
           return NextResponse.json({ error: 'File is required' }, { status: 400 });
         }
         
-        const compressedPDF = await compressPDF(file, quality);
+        const compressedPDF = await compressPDF(file);
         
-        return new NextResponse(compressedPDF, {
+        return new NextResponse(Buffer.from(compressedPDF), {
           headers: {
             'Content-Type': 'application/pdf',
             'Content-Disposition': 'attachment; filename="compressed.pdf"',
