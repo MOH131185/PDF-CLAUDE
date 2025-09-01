@@ -2,13 +2,13 @@ import Stripe from 'stripe';
 import { loadStripe } from '@stripe/stripe-js';
 
 // Server-side Stripe instance
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
   apiVersion: '2025-08-27.basil',
 });
 
 // Client-side Stripe instance
 export const getStripe = () => {
-  return loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  return loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
 };
 
 // Pricing configuration
@@ -32,7 +32,7 @@ export const PRICING_PLANS = {
     id: 'pro',
     name: 'Pro',
     price: 9,
-    stripePriceId: process.env.STRIPE_PRO_PRICE_ID!,
+    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || 'price_placeholder',
     features: [
       'Unlimited operations',
       'Files up to 100MB',

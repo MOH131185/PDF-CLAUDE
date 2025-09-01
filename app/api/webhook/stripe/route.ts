@@ -2,13 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
 
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export async function POST(req: NextRequest) {
   try {
+    if (!endpointSecret || endpointSecret === 'whsec_placeholder') {
+      return NextResponse.json({ error: 'Webhook endpoint not configured' }, { status: 400 });
+    }
+
     const body = await req.text();
     const headersList = await headers();
-    const sig = headersList.get('stripe-signature')!;
+    const sig = headersList.get('stripe-signature');
+
+    if (!sig) {
+      return NextResponse.json({ error: 'No stripe signature found' }, { status: 400 });
+    }
 
     let event;
 
