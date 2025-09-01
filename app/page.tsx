@@ -145,7 +145,7 @@ export default function Home() {
             />
             <PricingCard
               title="Pro"
-              price="$9"
+              price="$19"
               period="month"
               features={[
                 'Unlimited operations',
