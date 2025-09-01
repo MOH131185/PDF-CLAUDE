@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Allow all PDF tools
+Allow: /merge-pdf
+Allow: /split-pdf
+Allow: /compress-pdf
+
+# Allow important pages
+Allow: /pricing
+Allow: /dashboard
+Allow: /auth/signin
+Allow: /success
+
+# Disallow admin/internal pages
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Crawl delay
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://pdftools.com/sitemap.xml

@@ -1,4 +1,33 @@
+import { Metadata } from 'next';
 import PDFCompressor from '@/components/pdf-tools/PDFCompressor';
+import ToolErrorBoundary from '@/components/pdf-tools/ToolErrorBoundary';
+
+export const metadata: Metadata = {
+  title: 'Compress PDF Files Online - Free PDF Compressor | PDF Tools',
+  description: 'Reduce PDF file size online for free. Compress PDFs while maintaining quality. Fast and secure PDF compression with no watermarks.',
+  keywords: 'compress PDF, PDF compressor, reduce PDF size, optimize PDF, PDF tools, online PDF compression',
+  openGraph: {
+    title: 'Free Online PDF Compressor - Reduce PDF File Size',
+    description: 'Compress PDF files to reduce size while maintaining quality. Fast, secure, and free PDF compression tool.',
+    type: 'website',
+    images: [
+      {
+        url: '/og-compress-pdf.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PDF Compress Tool'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free PDF Compressor - Reduce File Size',
+    description: 'Compress PDF files online for free. Reduce size while maintaining quality.',
+  },
+  alternates: {
+    canonical: '/compress-pdf'
+  }
+};
 
 export default function CompressPDFPage() {
   return (
@@ -11,7 +40,9 @@ export default function CompressPDFPage() {
           </p>
         </div>
         
-        <PDFCompressor />
+        <ToolErrorBoundary toolName="PDF Compressor">
+          <PDFCompressor />
+        </ToolErrorBoundary>
       </div>
     </div>
   );

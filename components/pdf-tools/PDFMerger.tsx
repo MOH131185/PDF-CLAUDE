@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
 import { Merge, Download, ArrowUp, ArrowDown } from 'lucide-react';
 import FileUpload from '@/components/ui/FileUpload';
+import { showToast } from '@/lib/toast';
+import analytics from '@/lib/analytics';
 
 export default function PDFMerger() {
   const [files, setFiles] = useState<File[]>([]);
@@ -11,9 +12,18 @@ export default function PDFMerger() {
 
   const handleMerge = async () => {
     if (files.length < 2) {
-      toast.error('Please select at least 2 PDF files to merge');
+      showToast.error('Please select at least 2 PDF files to merge');
       return;
     }
+
+    // Track tool usage
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    analytics.pdfTool.toolUsed('PDF Merger', files.length, totalSize);
+    
+    const startTime = Date.now();
+
+    // Show processing toast
+    const processingToastId = showToast.pdf.processing('PDF merge');
 
     setIsProcessing(true);
     try {
@@ -29,8 +39,12 @@ export default function PDFMerger() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to merge PDFs');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to merge PDFs');
       }
+
+      // Dismiss processing toast
+      showToast.dismiss(processingToastId);
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -42,11 +56,22 @@ export default function PDFMerger() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      toast.success('PDFs merged successfully!');
+      // Track successful operation
+      const processingTime = Date.now() - startTime;
+      analytics.pdfTool.operationSuccess('PDF Merger', processingTime);
+      analytics.pdfTool.fileDownload('PDF Merger', blob.size);
+
+      showToast.pdf.success('PDF merge', files.length);
       setFiles([]);
     } catch (error) {
       console.error('Merge error:', error);
-      toast.error('Failed to merge PDFs. Please try again.');
+      showToast.dismiss(processingToastId);
+      
+      // Track error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      analytics.pdfTool.operationError('PDF Merger', errorMessage);
+      
+      showToast.pdf.error('PDF merge', error instanceof Error ? error.message : undefined);
     } finally {
       setIsProcessing(false);
     }
