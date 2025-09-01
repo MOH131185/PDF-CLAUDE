@@ -1,4 +1,33 @@
+import { Metadata } from 'next';
 import PDFSplitter from '@/components/pdf-tools/PDFSplitter';
+import ToolErrorBoundary from '@/components/pdf-tools/ToolErrorBoundary';
+
+export const metadata: Metadata = {
+  title: 'Split PDF Files Online - Free PDF Splitter Tool | PDF Tools',
+  description: 'Split PDF files by page ranges or extract specific pages. Free online PDF splitter with no watermarks. Secure and fast PDF splitting tool.',
+  keywords: 'split PDF, PDF splitter, extract PDF pages, divide PDF, PDF tools, online PDF splitter',
+  openGraph: {
+    title: 'Free Online PDF Splitter - Extract Pages from PDF',
+    description: 'Split PDF files into multiple documents or extract specific pages. Fast, secure, and free PDF splitter tool.',
+    type: 'website',
+    images: [
+      {
+        url: '/og-split-pdf.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PDF Split Tool'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free PDF Splitter - Extract PDF Pages',
+    description: 'Split PDF files online for free. Extract pages or divide PDF into multiple documents.',
+  },
+  alternates: {
+    canonical: '/split-pdf'
+  }
+};
 
 export default function SplitPDFPage() {
   return (
@@ -11,7 +40,9 @@ export default function SplitPDFPage() {
           </p>
         </div>
         
-        <PDFSplitter />
+        <ToolErrorBoundary toolName="PDF Splitter">
+          <PDFSplitter />
+        </ToolErrorBoundary>
       </div>
     </div>
   );

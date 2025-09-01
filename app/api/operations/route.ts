@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mergePDFs, splitPDF, compressPDF } from '@/lib/pdf-operations';
+import { withRateLimit, rateLimiters } from '@/lib/rateLimit';
 
-export async function POST(req: NextRequest) {
+async function handler(req: NextRequest) {
   try {
     // Check if we're in a build environment without proper setup
     if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
@@ -65,3 +66,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   }
 }
+
+// Apply rate limiting to the handler
+export const POST = withRateLimit(rateLimiters.pdfOperations, handler);

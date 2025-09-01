@@ -1,13 +1,48 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useOperations } from '@/hooks/useOperations';
-import { FileText, Merge, Split, Archive, Clock, Download } from 'lucide-react';
+import { FileText, Merge, Split, Archive, Clock, Download, Crown, AlertCircle, Settings, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { operations, isLoading } = useOperations();
+  const { operations, isLoading, remainingOperations, isProUser, subscription } = useOperations();
+  const [portalLoading, setPortalLoading] = useState(false);
+
+  const handleManageSubscription = async () => {
+    if (!user || !isProUser) {
+      toast.error('Please upgrade to Pro to manage your subscription');
+      return;
+    }
+
+    setPortalLoading(true);
+
+    try {
+      const response = await fetch('/api/create-portal-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create portal session');
+      }
+
+      // Redirect to Stripe Customer Portal
+      window.location.href = data.portalUrl;
+    } catch (error) {
+      console.error('Error creating portal session:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to open billing portal');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const tools = [
     {
@@ -43,6 +78,60 @@ export default function DashboardPage() {
           <p className="text-gray-600">
             Choose a tool to start working with your PDF files.
           </p>
+          
+          {/* Usage Status */}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {isProUser ? (
+                <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-yellow-50 text-yellow-800 px-4 py-2 rounded-lg border border-yellow-200">
+                  <Crown className="w-5 h-5" />
+                  <span className="font-medium">Pro Plan - Unlimited Operations</span>
+                </div>
+              ) : (
+              <div className="flex items-center space-x-2">
+                <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+                  remainingOperations > 2 
+                    ? 'bg-green-50 text-green-800 border-green-200' 
+                    : remainingOperations > 0 
+                    ? 'bg-yellow-50 text-yellow-800 border-yellow-200'
+                    : 'bg-red-50 text-red-800 border-red-200'
+                }`}>
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {remainingOperations} operations remaining today
+                  </span>
+                </div>
+                {remainingOperations === 0 && (
+                  <Link
+                    href="/upgrade"
+                    className="inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Crown className="w-4 h-4" />
+                    <span className="text-sm font-medium">Upgrade to Pro</span>
+                  </Link>
+                )}
+              </div>
+              )}
+            </div>
+            
+            {/* Manage Subscription Button */}
+            {isProUser && subscription && (
+              <button
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                className="inline-flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                {portalLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Settings className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">
+                  {portalLoading ? 'Loading...' : 'Manage Subscription'}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
