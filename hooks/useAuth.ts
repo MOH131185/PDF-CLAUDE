@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { User, AuthError } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { User, AuthError, Session } from '@supabase/supabase-js';
+import { auth } from '@/lib/supabase';
 import { toast } from 'react-hot-toast';
 
 interface AuthState {
@@ -22,14 +22,14 @@ export function useAuth() {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { user, error } = await auth.getCurrentUser();
         
         if (error) {
           console.error('Error getting session:', error);
         }
         
         setState({
-          user: session?.user ?? null,
+          user: user,
           loading: false,
           initialized: true,
         });
@@ -46,8 +46,8 @@ export function useAuth() {
     getInitialSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    const { data: { subscription } } = auth.onAuthStateChange(
+      async (event: string, session: Session | null) => {
         setState({
           user: session?.user ?? null,
           loading: false,
@@ -69,16 +69,13 @@ export function useAuth() {
     try {
       setState(prev => ({ ...prev, loading: true }));
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { user, session, error } = await auth.signIn(email, password);
 
       if (error) {
         throw error;
       }
 
-      return data;
+      return { user, session };
     } catch (error) {
       const authError = error as AuthError;
       toast.error(authError.message || 'Failed to sign in');
@@ -92,20 +89,17 @@ export function useAuth() {
     try {
       setState(prev => ({ ...prev, loading: true }));
       
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { user, session, error } = await auth.signUp(email, password);
 
       if (error) {
         throw error;
       }
 
-      if (data.user && !data.session) {
+      if (user && !session) {
         toast.success('Check your email for the confirmation link!');
       }
 
-      return data;
+      return { user, session };
     } catch (error) {
       const authError = error as AuthError;
       toast.error(authError.message || 'Failed to create account');
@@ -119,7 +113,7 @@ export function useAuth() {
     try {
       setState(prev => ({ ...prev, loading: true }));
       
-      const { error } = await supabase.auth.signOut();
+      const { error } = await auth.signOut();
       
       if (error) {
         throw error;
@@ -135,9 +129,7 @@ export function useAuth() {
 
   const resetPassword = useCallback(async (email: string) => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const { error } = await auth.resetPassword(email);
 
       if (error) {
         throw error;
