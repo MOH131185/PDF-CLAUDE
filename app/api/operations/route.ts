@@ -3,6 +3,10 @@ import { mergePDFs, splitPDF, compressPDF } from '@/lib/pdf-operations';
 
 export async function POST(req: NextRequest) {
   try {
+    // Check if we're in a build environment without proper setup
+    if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      // Allow operations in development/build
+    }
     const formData = await req.formData();
     const operation = formData.get('operation') as string;
     
